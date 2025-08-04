@@ -1478,9 +1478,9 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1206343644964078}
-  m_Text: "<color=#F9CA09>If the second character of the \r\nserial number is a letter,
-    press \nthe bottom-right button. Otherwise,\npress the button left or right of
-    \r\nthe bottom-right button.</color>"
+  m_Text: "<color=#F9CA09>A banana is an elongated, edible \nfruit-botanically a berry-produced
+    \nby several kinds of large treelike \nherbaceous flowering plants in the \ngenus
+    Musa.</color>"
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
