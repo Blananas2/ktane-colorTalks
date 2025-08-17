@@ -13,7 +13,6 @@ public class crazyTalkWithAKScript : MonoBehaviour {
     public KMBombModule Module;
 
     public Projector Projector;
-    public Material ProjectorMat;
     public Transform Wrapper;
     public KMSelectable[] Arrows;
     public KMSelectable Screen;
@@ -88,9 +87,9 @@ public class crazyTalkWithAKScript : MonoBehaviour {
         }
 
         MeshFilter.mesh = Meshes[chosenPairing];
-        Projector.material.mainTexture = Textures[centerIx];
-        //ProjectorMat.mainTexture = Textures[centerIx];
-        //Wrapper.localRotation = Quaternion.Euler(Rnd.Range(-5500, 5100) * 0.01f, 0f, Rnd.Range(-2700, 4000) * 0.01f);
+        Projector.material.SetTexture("_ShadowTex", Textures[centerIx]);
+        Projector.material.SetTexture("_FalloffTex", Textures[centerIx]);
+        Wrapper.transform.localEulerAngles = new Vector3(Rnd.Range(-5500, 5100) * 0.01f, 0f, Rnd.Range(-2700, 4000) * 0.01f);
 
         Debug.LogFormat("<Crazy Talk With A K #{0}> Applied distortion: {1}", moduleId, Wrapper.localRotation);
         Debug.LogFormat("[Crazy Talk With A K #{0}] Distorted word is {1}.", moduleId, table[centerIx]);

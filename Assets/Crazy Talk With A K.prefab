@@ -377,14 +377,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1630583717913544}
-  m_LocalRotation: {x: -0.22127163, y: 0.11662154, z: -0.4514355, w: 0.8565304}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4311853743961734}
   m_Father: {fileID: 4035970749944810}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: -15.8880005, y: 24.546001, z: -59.061005}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4114250483921012
 Transform:
   m_ObjectHideFlags: 1
@@ -1252,6 +1252,7 @@ MonoBehaviour:
   Audio: {fileID: 114268995706306160}
   Module: {fileID: 114465573047214182}
   Projector: {fileID: 119155217103629648}
+  Wrapper: {fileID: 4096521067226878}
   Arrows:
   - {fileID: 114515288072164596}
   - {fileID: 114701270994410544}
