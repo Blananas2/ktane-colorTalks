@@ -37,6 +37,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
     };
     int[][] pairings = { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 }, new int[] { 0, 4 }, new int[] { 0, 5 }, new int[] { 0, 6 }, new int[] { 0, 7 }, new int[] { 0, 8 }, new int[] { 1, 2 }, new int[] { 1, 3 }, new int[] { 1, 4 }, new int[] { 1, 5 }, new int[] { 1, 6 }, new int[] { 1, 7 }, new int[] { 1, 8 }, new int[] { 2, 3 }, new int[] { 2, 4 }, new int[] { 2, 5 }, new int[] { 2, 6 }, new int[] { 2, 7 }, new int[] { 2, 8 }, new int[] { 3, 4 }, new int[] { 3, 5 }, new int[] { 3, 6 }, new int[] { 3, 7 }, new int[] { 3, 8 }, new int[] { 4, 5 }, new int[] { 4, 6 }, new int[] { 4, 7 }, new int[] { 4, 8 }, new int[] { 5, 6 }, new int[] { 5, 7 }, new int[] { 5, 8 }, new int[] { 6, 7 }, new int[] { 6, 8 }, new int[] { 7, 8 } };
     char solutionLetter;
+    int selectedLetter = 9;
 
     //Logging
     static int moduleIdCounter = 1;
@@ -154,11 +155,33 @@ public class crazyTalkWithAKScript : MonoBehaviour
 
     void ArrowPress(int w)
     {
-
+        Arrows[w].AddInteractionPunch(0.5f);
+        if (moduleSolved) { return; }
+        switch (w)
+        {
+            case 0: selectedLetter += 15; break;
+            case 1: selectedLetter += 19; break;
+            case 2: selectedLetter++; break;
+            default: /*case 3:*/ selectedLetter += 5; break;
+        }
+        selectedLetter %= 20;
+        Letter.text = possibleLetters[selectedLetter].ToString();
     }
 
     void ScreenPress()
     {
-
+        Screen.AddInteractionPunch(1f);
+        if (moduleSolved) { return; }
+        if (possibleLetters[selectedLetter] == solutionLetter)
+        {
+            Module.HandlePass();
+            moduleSolved = true;
+            Debug.LogFormat("[Crazy Talk With A K #{0}] Submitted {1}, which is correct. Module solved.", moduleId, solutionLetter);
+        }
+        else
+        {
+            Module.HandleStrike();
+            Debug.LogFormat("[Crazy Talk With A K #{0}] Submitted {1}, which is incorrect, strike!", moduleId, possibleLetters[selectedLetter]);
+        }
     }
 }
