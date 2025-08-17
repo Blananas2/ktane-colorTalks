@@ -7,7 +7,8 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class crazyTalkWithAKScript : MonoBehaviour {
+public class crazyTalkWithAKScript : MonoBehaviour
+{
 
     public KMAudio Audio;
     public KMBombModule Module;
@@ -42,7 +43,8 @@ public class crazyTalkWithAKScript : MonoBehaviour {
     int moduleId;
     private bool moduleSolved;
 
-    void Awake () {
+    void Awake()
+    {
         moduleId = moduleIdCounter++;
 
         for (int a = 0; a < 4; a++)
@@ -54,13 +56,24 @@ public class crazyTalkWithAKScript : MonoBehaviour {
         Screen.OnInteract += delegate () { ScreenPress(); return false; };
     }
 
+    private float projectorNearClipPlane;
+    private float projectorFarClipPlane;
+    private float projectorOrthographicSize;
+
+    private void Update()
+    {
+        float scale = transform.lossyScale.x;
+        Projector.nearClipPlane = projectorNearClipPlane * scale;
+        Projector.farClipPlane = projectorFarClipPlane * scale;
+        Projector.orthographicSize = projectorOrthographicSize * scale;
+    }
+
     // Use this for initialization
     void Start()
     {
-        float scale = transform.lossyScale.x;
-        Projector.nearClipPlane *= scale;
-        Projector.farClipPlane *= scale;
-        Projector.orthographicSize *= scale;
+        projectorNearClipPlane = Projector.nearClipPlane;
+        projectorFarClipPlane = Projector.farClipPlane;
+        projectorOrthographicSize = Projector.orthographicSize;
 
         solutionLetter = possibleLetters.PickRandom();
         bool foundSolution = false;
@@ -87,8 +100,9 @@ public class crazyTalkWithAKScript : MonoBehaviour {
         }
 
         MeshFilter.mesh = Meshes[chosenPairing];
-        Projector.material.SetTexture("_ShadowTex", Textures[centerIx]);
-        Projector.material.SetTexture("_FalloffTex", Textures[centerIx]);
+        // clone the mat
+        Projector.material = new Material(Projector.material);
+        Projector.material.mainTexture = Textures[centerIx];
         Wrapper.transform.localEulerAngles = new Vector3(Rnd.Range(-5500, 5100) * 0.01f, 0f, Rnd.Range(-2700, 4000) * 0.01f);
 
         Debug.LogFormat("<Crazy Talk With A K #{0}> Applied distortion: {1}", moduleId, Wrapper.localRotation);
@@ -138,11 +152,13 @@ public class crazyTalkWithAKScript : MonoBehaviour {
         return w;
     }
 
-    void ArrowPress(int w) {
-        
+    void ArrowPress(int w)
+    {
+
     }
 
-    void ScreenPress() {
+    void ScreenPress()
+    {
 
     }
 }
