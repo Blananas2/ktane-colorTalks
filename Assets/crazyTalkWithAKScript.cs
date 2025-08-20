@@ -156,6 +156,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
     void ArrowPress(int w)
     {
         Arrows[w].AddInteractionPunch(0.5f);
+        Audio.PlaySoundAtTransform("CTWAK_press", Arrows[w].transform);
         if (moduleSolved) { return; }
         switch (w)
         {
@@ -174,9 +175,12 @@ public class crazyTalkWithAKScript : MonoBehaviour
         if (moduleSolved) { return; }
         if (possibleLetters[selectedLetter] == solutionLetter)
         {
+            Audio.PlaySoundAtTransform("CTWAK_solve", Screen.transform);
             Module.HandlePass();
             moduleSolved = true;
             Debug.LogFormat("[Crazy Talk With A K #{0}] Submitted {1}, which is correct. Module solved.", moduleId, solutionLetter);
+            Letter.text = null;
+            Wrapper.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
         }
         else
         {
