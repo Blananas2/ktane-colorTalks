@@ -27,22 +27,23 @@ public class kiloTalkScript : MonoBehaviour
     private bool moduleSolved;
 
     ulong[] unitValues = {
-                 100, //Milligram
-                1000, //Centigram
-               10000, //Decigram
-               20000, //Carat
-              100000, //Gram
-             1000000, //Dekagram
-             2834952, //Ounce
-            10000000, //Hectogram
-            45359240, //Pound
-           100000000, //Kilogram
-           635029300, //Stone
-         90718474000, //Short ton
-        100000000000, //Metric tonne
-        101604690900, //Long ton
+      //TGMkhχ-dcmμnpfaz
+                 1000000, //Milligrams
+                10000000, //Centigrams
+               100000000, //Decigrams
+               200000000, //Carats (= 200 mg)
+              1000000000, //Grams
+             10000000000, //Dekagrams
+             28349523125, //Ounces (= 28.349523125 g)
+            100000000000, //Hectograms
+            453592370000, //Pounds (≡ 0.45359237 kg)
+           1000000000000, //Kilograms
+           6350293180000, //Stone (= 6.35029318 kg)
+         907184740000000, //Short Tons (= 907.18474 kg)
+        1000000000000000, //Metric Tonnes (= 1000 kg)
+        1016046908800000, //Long Tons (= 1016.0469088 kg)
     };
-    string[] unitNames = { "Milligrams", "Centigrams", "Decigrams", "Carats", "Grams", "Dekagrams", "Ounces", "Hectograms", "Pounds", "Kilograms", "Stone", "Short tons", "Metric tonnes", "Long tons" };
+    string[] unitNames = { "Milligrams", "Centigrams", "Decigrams", "Carats", "Grams", "Dekagrams", "Ounces", "Hectograms", "Pounds", "Kilograms", "Stone", "Short Tons", "Metric Tonnes", "Long Tons" };
     ulong answer;
     string answerString;
     string givenString = "0";
@@ -64,7 +65,7 @@ public class kiloTalkScript : MonoBehaviour
     void Start()
     {
     tryAgain:
-        ulong number = (ulong)Rnd.Range(1, 100000);
+        ulong number = (ulong)Rnd.Range(1, 10000);
         int fromUnit = Rnd.Range(0, 14);
         int toUnit = Rnd.Range(0, 14);
         while (fromUnit == toUnit)
