@@ -279,7 +279,7 @@ public class standardCrazyTalkScript : MonoBehaviour
                     ButtonMeshes[m].material = ButtonColors[b == correctButton ? 2 : 1];
                     if (CBactive)
                     {
-                        CBtexts[m].text = b == correctButton ? "G" : "R";
+                        CBtexts[m].text = b == correctButton ? "✓" : "✗";
                     }
                 }
                 GenerateQuestion();

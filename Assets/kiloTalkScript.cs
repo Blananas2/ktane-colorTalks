@@ -49,6 +49,7 @@ public class kiloTalkScript : MonoBehaviour
     string givenString = "0";
     int numberOfDigits = 0;
     bool moving = false;
+    int attps = 0;
 
     void Awake()
     {
@@ -75,11 +76,13 @@ public class kiloTalkScript : MonoBehaviour
         answer = number * unitValues[fromUnit] / unitValues[toUnit];
         if (answer <= 0 || answer >= 1000000000000000ul)
         {
+            attps++;
             goto tryAgain;
         }
         NumberTexts[0].text = number.ToString();
         UnitText.text = unitNames[fromUnit] + "<size=72> to</size>\n" + unitNames[toUnit];
         answerString = answer.ToString();
+        Debug.LogFormat("<Kilo Talk #{0}> Failed attempts: {1}", moduleId, attps);
         Debug.LogFormat("[Kilo Talk #{0}] {1} {2} to {3} is {4}", moduleId, number, unitNames[fromUnit], unitNames[toUnit], answer);
     }
 

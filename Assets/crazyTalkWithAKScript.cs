@@ -94,6 +94,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
                 pair = pairings[chosenPairing];
                 if (InCommon(table[Offset(centerIx, pair[0])], table[Offset(centerIx, pair[1])]) == solutionLetter)
                 {
+                    Debug.LogFormat("<Crazy Talk With A K #{0}> Attempt details: co={1} po={2}", moduleId, co, po);
                     foundSolution = true;
                     break;
                 }
