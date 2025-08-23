@@ -19,9 +19,18 @@ MonoBehaviour:
 
     Modules by Blananas2
 
+    Unity help (for CTWAK) by UnrulyJuli3
+
+    Guidance (for CTWAK) by TheyCallMeSpy
+
+    Concepts by the original author and Blananas2
+
 
     Note that while these modules initially released in 2020, they got a major overhaul
-    in 2025.'
+    in 2025.
+
+    Check "Replace Obsolete Mods" in Tweaks to ensure you''re on the latest version
+    of all modules.'
   version: 
   outputFolder: build
   previewImage: {fileID: 0}
