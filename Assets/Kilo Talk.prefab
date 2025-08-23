@@ -1225,7 +1225,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1972231414564882}
-  m_Text: 99999
+  m_Text: -999
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -1248,7 +1248,7 @@ TextMesh:
   m_GameObject: {fileID: 1206229742868760}
   m_Text: 'Milligrams<size=72> to</size>
 
-    Metric tonnes'
+    Long Tons'
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
