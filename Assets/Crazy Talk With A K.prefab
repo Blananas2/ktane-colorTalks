@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 33912548706630594}
   - component: {fileID: 23461907444535090}
   - component: {fileID: 114701891982159604}
-  m_Layer: 16
+  m_Layer: 29
   m_Name: Surface
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1838,7 +1838,7 @@ Projector:
   m_Enabled: 1
   serializedVersion: 2
   m_NearClipPlane: 0.1
-  m_FarClipPlane: 0.3
+  m_FarClipPlane: 0.2
   m_FieldOfView: 60
   m_AspectRatio: 1
   m_Orthographic: 1
@@ -1846,4 +1846,4 @@ Projector:
   m_Material: {fileID: 2100000, guid: 2fb2a5a6aecdefa4b876c5d8020c7af2, type: 2}
   m_IgnoreLayers:
     serializedVersion: 2
-    m_Bits: 4294901759
+    m_Bits: 3758030847
