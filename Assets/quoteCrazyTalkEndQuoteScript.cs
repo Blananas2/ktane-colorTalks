@@ -139,7 +139,7 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
             int ep = positions[ctee[e]];
             string d = tableDigits[e][e % 2 == 0 ? ep % 10 : ep / 10].ToString();
             uncycledDigits[e] = d;
-            correctDigits[(e + Array.IndexOf(ctee, quoted)) % 4] = d;
+            correctDigits[(e + 4 - Array.IndexOf(ctee, quoted)) % 4] = d;
         }
         Debug.LogFormat("[Quote Crazy Talk End Quote #{0}] The corresponding digits, from north going clockwise: {1}", moduleId, uncycledDigits.Join(", "));
         Debug.LogFormat("[Quote Crazy Talk End Quote #{0}] The correct order of the digits, quotes going clockwise: {1}", moduleId, correctDigits.Join(", "));
