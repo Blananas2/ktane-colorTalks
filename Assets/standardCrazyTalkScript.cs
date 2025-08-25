@@ -342,4 +342,132 @@ public class standardCrazyTalkScript : MonoBehaviour
         Instruction.text = questionText;
         correctButton = answers[chosenQuestion];
     }
+
+    // Twitch Plays Support by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} hover brgybrgy [hovers over the buttons in that order] || !{0} press b [presses the button with that color] || !{0} press tr [presses the button corresponding to that position]";
+#pragma warning restore 414
+    private bool TwitchShouldCancelCommand;
+    private Coroutine isHovering;
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if ("HOVER".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what colors you want to hover!";
+                yield break;
+            }
+
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters. Please try again!";
+                yield break;
+            }
+
+            if (!split[1].Any("BRGY".Contains))
+            {
+                yield return string.Format("sendtochaterror {0} isn't/aren't valid color(s)!", split[1].Where(x => !"BRGY".Contains(x)).Join(", "));
+                yield break;
+            }
+
+            isHovering = StartCoroutine(Hover(split[1]));
+
+            while (isHovering != null)
+                yield return "trycancel";
+
+            yield break;
+        }
+
+        if ("PRESS".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror Press what?";
+                yield break;
+            }
+
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters. Please try again!";
+                yield break;
+            }
+
+            if (split[1].Length > 2)
+            {
+                yield return "sendtochaterror Please specify either a color or a position!";
+                yield break;
+            }
+
+            if (split[1].Length == 1)
+            {
+                if (!"BRGY".Contains(split[1]))
+                {
+                    yield return string.Format("sendtochaterror {0} is not valid!", split[1]);
+                    yield break;
+                }
+
+                var getColorPositions = colors.Select(x => colorNames[x]).ToArray();
+
+                Buttons[Array.IndexOf(getColorPositions, colorNames["BRGY".IndexOf(split[1])])].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                yield break;
+            }
+
+            if (split[1].Length == 2)
+            {
+                var validDirs = new[] { "TL", "TR", "BL", "BR" };
+
+                if (!validDirs.Contains(split[1]))
+                {
+                    yield return string.Format("sendtochaterror {0} is not valid!", split[1]);
+                    yield break;
+                }
+
+                Buttons[Array.IndexOf(validDirs, split[1])].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (isHovering != null)
+            yield return true;
+
+        if (moduleSolved)
+            yield break;
+
+        Buttons[correctButton].OnInteract();
+        yield return new WaitForSeconds(0.1f);
+    }
+
+
+    IEnumerator Hover(string colorStr)
+    {
+        var colorStrToNames = colorStr.Select(x => colorNames["BRGY".IndexOf(x)]).ToArray();
+
+        var getColorPositions = colors.Select(x => colorNames[x]).ToArray();
+
+        var colorNamesToPositions = colorStrToNames.Select(x => Array.IndexOf(getColorPositions, x)).ToArray();
+
+        foreach (var pos in colorNamesToPositions)
+        {
+            Buttons[pos].OnHighlight();
+            yield return new WaitForSeconds(0.25f);
+
+            if (TwitchShouldCancelCommand)
+                break;
+        }
+
+        isHovering = null;
+    }
+
+
 }

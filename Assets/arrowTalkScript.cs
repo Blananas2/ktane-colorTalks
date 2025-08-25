@@ -31,6 +31,9 @@ public class arrowTalkScript : MonoBehaviour
     bool CBactive;
     float[] CBfloats = { 67.5f, 22.5f, 337.5f, 292.5f, 247.5f, 202.5f, 157.5f, 112.5f };
 
+    int relativePosition;
+    
+
     //Logging
     static int moduleIdCounter = 1;
     int moduleId;
@@ -81,6 +84,7 @@ public class arrowTalkScript : MonoBehaviour
         switch (Rnd.Range(0, 7))
         {
             case 0: //color
+                SetCBForTP(x);
                 if (CBactive)
                 {
                     CBtext.text = hollowArrow;
@@ -125,6 +129,8 @@ public class arrowTalkScript : MonoBehaviour
                     relativeTo = Rnd.Range(0, 8);
                 } while (relativeTo == x);
                 string relativeColor = colorNames[(relativeTo - redArrow + 8) % 8];
+
+                SetCBForTP(relativeTo);
                 if (CBactive)
                 {
                     CBtext.text = hollowArrow;
@@ -133,6 +139,37 @@ public class arrowTalkScript : MonoBehaviour
 
                 return Rnd.Range(0, 2) == 0 ? ((x + 8 - relativeTo) % 8 + "\nClockwise\nfrom\n" + relativeColor) : (8 - ((x + 8 - relativeTo) % 8) + "\nCounter\nfrom\n" + relativeColor);
         }
+    }
+
+    void SetCBForTP(int relativeTo)
+    {
+        relativePosition = relativeTo;
+    }
+
+    void ToggleCBforTP()
+    {
+        CBactive = !CBactive;
+
+        var colorNames = new[]
+        {
+            "Red",
+            "Orange",
+            "Yellow",
+            "Green", "Lime",
+            "Cyan", "Aqua",
+            "Blue",
+            "Purple", "Violet",
+            "Pink", "Fuschia"
+        };
+
+        if (!colorNames.Contains(Phrase.text) || !CBactive)
+        {
+            CBtext.text = string.Empty;
+            return;
+        }
+
+        CBtext.text = "        ⇨";
+        CBtextObj.transform.localRotation = Quaternion.Euler(90f, 0f, CBfloats[relativePosition]);
     }
 
     void ArrowPress(int p)
@@ -198,4 +235,65 @@ public class arrowTalkScript : MonoBehaviour
         }
     }
 
+    // Twitch Plays Support by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} colorblind/cb [toggles colorblind] || !{0} arrow 8 [press that arrow (numbers start from NNE, going clockwise)]";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if (new[] { "CB", "COLORBLIND" }.Contains(split[0]))
+        {
+            if (split.Length > 1)
+                yield break;
+
+            ToggleCBforTP();
+
+            yield break;
+        }
+
+        if ("ARROW".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror What numbered arrow to press?";
+                yield break;
+            }
+
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters. Please try again!";
+                yield break;
+            }
+
+            if (split[1].Length > 1)
+            {
+                yield return "sendtochaterror Make sure you're using a single digit and not multiple!";
+                yield break;
+            }
+
+            if (!Enumerable.Range(0, 8).Select(x => x + 1).Contains(int.Parse(split[1])))
+            {
+                yield return string.Format("sendtochaterror {0} is not a valid number. Make sure it's not a letter and that it's in the range of 1-8!", split[1]);
+                yield break;
+            }
+
+            Arrows[int.Parse(split[1]) - 1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (!moduleSolved)
+        {
+            Arrows[correctArrow].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
 }

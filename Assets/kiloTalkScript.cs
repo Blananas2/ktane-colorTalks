@@ -155,4 +155,108 @@ public class kiloTalkScript : MonoBehaviour
     { //this assumes t is in the range 0-1
         return a * (1f - t) + b * t;
     }
+
+    // Twitch Plays Support by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} enter 0123456789 [enters the number you want to input from the current index] || !{0} submit [submits the number you have]";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if ("ENTER".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror Enter what?";
+                yield break;
+            }
+
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters. Please try again!";
+                yield break;
+            }
+
+            if (!split[1].Any(char.IsDigit))
+            {
+                yield return string.Format("sendtochaterror {0} is/are invalid!", split[1].Where(x => !char.IsDigit(x)).Join(", "));
+                yield break;
+            }
+
+            if (split[1].Length > 14)
+            {
+                yield return "sendtochaterror You have too many numbers!";
+                yield break;
+            }
+
+            for (int i = 0; i < split[1].Length; i++)
+            {
+                var targetNumber = int.Parse(split[1][i].ToString());
+                var currentNumber = int.Parse(givenString[numberOfDigits].ToString());
+
+                while (currentNumber != targetNumber)
+                {
+                    UpDownArrows[currentNumber < targetNumber ? 0 : 1].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                    currentNumber = int.Parse(givenString[numberOfDigits].ToString());
+                }
+
+                if (i != split[1].Length - 1)
+                {
+                    RightArrow.OnInteract();
+                    yield return new WaitWhile(() => moving);
+                }
+            }
+
+            yield break;
+        }
+
+        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length > 1)
+                yield break;
+
+            Submit.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (givenString == answerString)
+        {
+            Submit.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+            yield break;
+        }
+
+        for (int i = numberOfDigits; i < answerString.Length; i++)
+        {
+            var targetNumber = int.Parse(answerString[i].ToString());
+            var currentNumber = int.Parse(givenString[i].ToString());
+
+            while (currentNumber != targetNumber)
+            {
+                UpDownArrows[currentNumber < targetNumber ? 0 : 1].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                currentNumber = int.Parse(givenString[i].ToString());
+            }
+
+            if (i != answerString.Length - 1)
+            {
+                RightArrow.OnInteract();
+                yield return new WaitWhile(() => moving);
+            }
+        }
+
+        yield return null;
+
+        Submit.OnInteract();
+        yield return new WaitForSeconds(0.1f);
+    }
 }

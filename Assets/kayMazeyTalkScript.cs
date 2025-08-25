@@ -221,7 +221,7 @@ public class kayMazeyTalkScript : MonoBehaviour
     // Twitch Plays Support by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} start will start the module || !{0} move urdl to move that many directions";
+    private readonly string TwitchHelpMessage = @"!{0} start [will start the module] || !{0} move urdl [to move that many directions]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
