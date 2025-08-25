@@ -40,6 +40,7 @@ public class kayMazeyTalkScript : MonoBehaviour
     };
     bool traversable = false;
     bool invert = false;
+    bool tpInvertKnown = false;
     int currentPosition = -1;
     int goalPosition = -1;
     int[] vectors = { -6, 1, 6, -1 };
@@ -74,6 +75,7 @@ public class kayMazeyTalkScript : MonoBehaviour
         }
 
         invert = Rnd.Range(0, 10) < 4;
+        tpInvertKnown = invert;
 
         Debug.LogFormat("[KayMazey Talk #{0}] Your goal is {1}.", moduleId, mazeWords[goalPosition]);
         Debug.LogFormat("[KayMazey Talk #{0}] You start at {1}.", moduleId, mazeWords[currentPosition]);
@@ -274,9 +276,16 @@ public class kayMazeyTalkScript : MonoBehaviour
                 Arrows["URDL".IndexOf(split[1][i])].OnInteract();
                 yield return new WaitForSeconds(0.1f);
 
-                if (invert)
+                if (invert && !tpInvertKnown)
                 {
+                    tpInvertKnown = true;
                     yield return string.Format("sendtochat The current display doesn't contain a capital K. The command was halted after {0} movements.", i + 1);
+                    yield break;
+                }
+                else if (!invert && tpInvertKnown)
+                {
+                    tpInvertKnown = false;
+                    yield return string.Format("sendtochat The current display contains a capital K. The command was halted after {0} movements.", i + 1);
                     yield break;
                 }
             }

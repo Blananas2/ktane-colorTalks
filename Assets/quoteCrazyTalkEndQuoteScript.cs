@@ -56,6 +56,7 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
     List<string> submitted = new List<string> { };
     bool struck = false;
     bool good = false;
+    bool started = false;
     bool[] pressed = { false, false, false, false };
     int attps = 0;
     int attws = 0;
@@ -238,6 +239,7 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
             MainScreen.AddInteractionPunch(0.5f);
             HighlightObj.SetActive(false);
             StartCoroutine(AnimScreens());
+            started = true;
         }
     }
 
@@ -288,7 +290,7 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
         SmallObjs[3].transform.localPosition = new Vector3(-1.333f, 0f, 0f);
 
         elapsed = 0f;
-        duration = 4f;
+        duration = TwitchPlaysActive ? 30f : 4f;
         while (elapsed < duration && !struck && !good)
         {
             yield return null;
@@ -319,6 +321,7 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
         else
         {
             Strike();
+            started = false;
         }
     }
 
@@ -422,5 +425,89 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
     float Lerp(float a, float b, float t)
     { //this assumes t is in the range 0-1
         return a * (1f - t) + b * t;
+    }
+
+    // Twitch Plays Support by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} start will initialize the module. || !{0} submit 1234 presses the positions in that order (where 1 is up going clockwise). In Twitch Plays, the limited time is extended";
+    private bool TwitchPlaysActive;
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if ("START".ContainsIgnoreCase(split[0]))
+        {
+            if (started)
+            {
+                yield return "sendtochaterror The module has already started!";
+                yield break;
+            }
+
+            if (split.Length > 1)
+                yield break;
+
+            MainScreen.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+            yield break;
+        }
+
+        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        {
+            if (!started)
+            {
+                yield return "sendtochaterror The module hasn't been started yet!";
+                yield break;
+            }
+
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror Submit what?";
+                yield break;
+            }
+
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters inputted. Please try again!";
+                yield break;
+            }
+
+            if (split[1].Length != 4 || split[1].Distinct().Count() != 4)
+            {
+                yield return "sendtochaterror You must input the exact length of 4 and they must be unique!";
+                yield break;
+            }
+
+            if (split[1].Select(x => int.Parse(x.ToString())).Any(x => x == -1 || !Enumerable.Range(0, 4).Contains(x - 1)))
+            {
+                yield return "sendtochaterror The numbers inputted are either invalid or not within the range of 1-4!";
+                yield break;
+            }
+
+            foreach (var num in split[1].Select(x => int.Parse(x.ToString()) - 1))
+            {
+                SmallScreens[num].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+    }
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (!started)
+        {
+            MainScreen.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            SmallScreens[randDigits.Count(x => correctDigits[i] == x) > 1 ? Enumerable.Range(0, 4).Where(x => !pressed[x] && randDigits[x] == correctDigits[i]).PickRandom() : Array.IndexOf(randDigits, correctDigits[i])].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+
     }
 }

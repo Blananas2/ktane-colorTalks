@@ -189,4 +189,109 @@ public class crazyTalkWithAKScript : MonoBehaviour
             Debug.LogFormat("[Crazy Talk With A K #{0}] Submitted {1}, which is incorrect, strike!", moduleId, possibleLetters[selectedLetter]);
         }
     }
+
+    // Twitch Plays by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} submit k submits the letter k";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what letter to submit!";
+                yield break;
+            }
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters inputted. Please try again!";
+            }
+
+            if (split[1].Length > 1)
+                yield break;
+
+            if (!possibleLetters.Contains(split[1]))
+            {
+                yield return string.Format("sendtochaterror {0} is not a valid letter!", split[1]);
+                yield break;
+            }
+
+            var letterToSubmit = possibleLetters.IndexOf(split[1]);
+
+            while (letterToSubmit != selectedLetter)
+            {
+                var distance = (Math.Abs(selectedLetter - letterToSubmit) + 10) % 20 - 10;
+
+                if (selectedLetter > letterToSubmit)
+                    distance *= -1;
+
+                if (distance > 5)
+                {
+                    Arrows[3].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                else if (distance > 0)
+                {
+                    Arrows[2].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                else if (distance < -5)
+                {
+                    Arrows[0].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                else if (distance < 0)
+                {
+                    Arrows[1].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+            Screen.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        var targetLetter = possibleLetters.IndexOf(solutionLetter);
+
+        while (targetLetter != selectedLetter)
+        {
+            var distance = (Math.Abs(selectedLetter - targetLetter) + 10) % 20 - 10;
+
+            if (selectedLetter > targetLetter)
+                distance *= -1;
+
+            if (distance > 5)
+            {
+                Arrows[3].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            else if (distance > 0)
+            {
+                Arrows[2].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            else if (distance < -5)
+            {
+                Arrows[0].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            else if (distance < 0)
+            {
+                Arrows[1].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        Screen.OnInteract();
+        yield return new WaitForSeconds(0.1f);
+    }
 }

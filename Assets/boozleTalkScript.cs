@@ -178,4 +178,52 @@ public class boozleTalkScript : MonoBehaviour
             } }
         }
     };
+
+    // Twitch Plays Support by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpCommand = @"!{0} submit # to submit when the timer contains that digit";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length == 1)
+            {
+                yield return "Submit on what digit?";
+                yield break;
+            }
+
+            if (split.Length > 2)
+                yield break;
+
+            int digitToPress;
+
+            if (!int.TryParse(split[1], out digitToPress))
+            {
+                yield return string.Format("The digit you tried to input ({0}) is not valid. Make sure the digit you want to submit is 0-9.", split[1]);
+                yield break;
+            }
+
+            while (!Bomb.GetFormattedTime().Contains(digitToPress.ToString()))
+                yield return "trycancel";
+
+            Selectable.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (!Bomb.GetFormattedTime().Contains(digit.ToString()))
+            yield return true;
+
+        Selectable.OnInteract();
+        yield return new WaitForSeconds(0.1f);
+    }
 }
