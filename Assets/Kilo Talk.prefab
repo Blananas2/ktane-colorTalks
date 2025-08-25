@@ -97,8 +97,8 @@ GameObject:
   - component: {fileID: 33759940447605498}
   - component: {fileID: 23986441416389064}
   - component: {fileID: 114665684000910878}
-  - component: {fileID: 64834286122783218}
   - component: {fileID: 114184290659889150}
+  - component: {fileID: 65618090183398538}
   m_Layer: 0
   m_Name: Down
   m_TagString: Untagged
@@ -154,8 +154,8 @@ GameObject:
   - component: {fileID: 33294325838354396}
   - component: {fileID: 23293966716773262}
   - component: {fileID: 114696146225907622}
-  - component: {fileID: 64805027754684874}
   - component: {fileID: 114911570370535640}
+  - component: {fileID: 65733928784448598}
   m_Layer: 0
   m_Name: Up
   m_TagString: Untagged
@@ -1190,22 +1190,8 @@ MeshCollider:
   m_CookingOptions: 14
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 1b003d74481a9ae46b3e5b58e93275d5, type: 3}
---- !u!64 &64805027754684874
-MeshCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1209378895890318}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_SkinWidth: 0.01
-  m_Mesh: {fileID: 4300000, guid: 4b4b23b79ea47ce4dab91de5252e8282, type: 3}
---- !u!64 &64834286122783218
-MeshCollider:
+--- !u!65 &65618090183398538
+BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
@@ -1213,11 +1199,21 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_SkinWidth: 0.01
-  m_Mesh: {fileID: 4300000, guid: 4b4b23b79ea47ce4dab91de5252e8282, type: 3}
+  serializedVersion: 2
+  m_Size: {x: 0.7, y: 0.2, z: 0.8}
+  m_Center: {x: 0, y: 0, z: -0.066421494}
+--- !u!65 &65733928784448598
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1209378895890318}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.7, y: 0.2, z: 0.8}
+  m_Center: {x: 0, y: 0, z: -0.066421494}
 --- !u!102 &102183512326726268
 TextMesh:
   serializedVersion: 3
@@ -1549,7 +1545,7 @@ MonoBehaviour:
   ChildRowLength: 0
   Highlight: {fileID: 114249018827597892}
   SelectableColliders:
-  - {fileID: 64834286122783218}
+  - {fileID: 65618090183398538}
   DefaultSelectableIndex: 0
   AllowSelectionWrapX: 0
   AllowSelectionWrapY: 0
@@ -1572,7 +1568,7 @@ MonoBehaviour:
   ChildRowLength: 0
   Highlight: {fileID: 114788018122475362}
   SelectableColliders:
-  - {fileID: 64805027754684874}
+  - {fileID: 65733928784448598}
   DefaultSelectableIndex: 0
   AllowSelectionWrapX: 0
   AllowSelectionWrapY: 0

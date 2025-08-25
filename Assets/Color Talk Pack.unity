@@ -113,23 +113,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &131932142 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1209378895890318, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa,
-    type: 2}
-  m_PrefabInternal: {fileID: 694451785}
---- !u!65 &131932144
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 131932142}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.7, y: 0.2, z: 0.8}
-  m_Center: {x: 0, y: 0, z: -0.066421494}
 --- !u!1 &310392698
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,23 +240,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 20756a1e5ea51a6478f5ebaf236e7adc, type: 2}
   m_IsPrefabParent: 0
---- !u!1 &511713949 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1194190557433116, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa,
-    type: 2}
-  m_PrefabInternal: {fileID: 694451785}
---- !u!65 &511713951
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 511713949}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.7, y: 0.2, z: 0.8}
-  m_Center: {x: 0, y: 0, z: -0.066421494}
 --- !u!1001 &562664596
 Prefab:
   m_ObjectHideFlags: 0
@@ -355,23 +321,7 @@ Prefab:
       propertyPath: m_RootOrder
       value: 10
       objectReference: {fileID: 0}
-    - target: {fileID: 114696146225907622, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa,
-        type: 2}
-      propertyPath: SelectableColliders.Array.data[0]
-      value: 
-      objectReference: {fileID: 131932144}
-    - target: {fileID: 114665684000910878, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa,
-        type: 2}
-      propertyPath: SelectableColliders.Array.data[0]
-      value: 
-      objectReference: {fileID: 511713951}
-    - target: {fileID: 1471068935545430, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 64805027754684874, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa, type: 2}
-    - {fileID: 64834286122783218, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa, type: 2}
+    m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6e51cf56b8e7bdb4d9850c3f6409b5aa, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &775715395
