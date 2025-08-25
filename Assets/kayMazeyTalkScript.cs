@@ -215,4 +215,155 @@ public class kayMazeyTalkScript : MonoBehaviour
     { //this assumes t is in the range 0-1
         return a * (1f - t) + b * t;
     }
+
+    // Twitch Plays Support by Kilo Bites
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} start will start the module || !{0} move urdl to move that many directions";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        yield return null;
+
+        if ("START".ContainsIgnoreCase(split[0]))
+        {
+            if (split.Length > 1)
+                yield break;
+
+            if (traversable)
+            {
+                yield return "sendtochaterror The module has already started!";
+                yield break;
+            }
+
+            Screen.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+            yield break;
+        }
+
+        if ("MOVE".ContainsIgnoreCase(split[0]))
+        {
+            if (!traversable)
+            {
+                yield return "sendtochaterror The module cannot move due to it being in its initial state!";
+                yield break;
+            }
+
+            if (split.Length == 1)
+            {
+                yield return "sendtochaterror Move where?";
+                yield break;
+            }
+            if (split.Length > 2)
+            {
+                yield return "sendtochaterror You inputted too many parameters! Please try again!";
+                yield break;
+            }
+
+            if (!split[1].Any("URDL".Contains))
+            {
+                yield return string.Format("{0} is/are invalid!", split[1].Where(x => !"URDL".Contains(x)).Join(", "));
+                yield break;
+            }
+
+            for (int i = 0; i < split[1].Length; i++)
+            {
+                Arrows["URDL".IndexOf(split[1][i])].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+
+                if (invert)
+                {
+                    yield return string.Format("sendtochat The current display doesn't contain a capital K. The command was halted after {0} movements.", i + 1);
+                    yield break;
+                }
+            }
+
+        }
+    }
+
+    private struct QueueInfo
+    {
+        public int CurrentPos;
+        public int? ParentPos;
+        public int? Direction;
+
+        public QueueInfo(int currentPos, int? parentPos, int? direction)
+        {
+            CurrentPos = currentPos;
+            ParentPos = parentPos;
+            Direction = direction;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (!traversable)
+        {
+            Screen.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+
+
+        var q = new Queue<QueueInfo>();
+        var visited = new Dictionary<int, QueueInfo>();
+
+        q.Enqueue(new QueueInfo(currentPosition, null, null));
+
+        while (q.Count > 0)
+        {
+            var qi = q.Dequeue();
+
+            if (visited.ContainsKey(qi.CurrentPos))
+                continue;
+
+            visited[qi.CurrentPos] = qi;
+
+            if (qi.CurrentPos == goalPosition)
+                goto goalfound;
+
+            for (int i = 0; i < 4; i++)
+            {
+                var p = (int)Math.Pow(2, i);
+
+                if ((mazeDirs[qi.CurrentPos] & p) == p)
+                    q.Enqueue(new QueueInfo(qi.CurrentPos + vectors[i], qi.CurrentPos, i));
+            }
+        }
+
+        throw new InvalidOperationException("The maze is not solvable!");
+
+    goalfound:
+
+        var r = goalPosition;
+        var path = new List<int>();
+
+        while (true)
+        {
+            var nr = visited[r];
+
+            if (nr.ParentPos == null)
+                break;
+
+            path.Add(nr.Direction.Value);
+
+            r = nr.ParentPos.Value;
+        }
+
+        var opposites = new Dictionary<int, int>
+        {
+            { 0, 2 },
+            { 1, 3 },
+            { 2, 0 },
+            { 3, 1 }
+        };
+
+        for (int i = path.Count - 1; i >= 0; i--)
+        {
+            Arrows[invert ? opposites[path[i]] : path[i]].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
 }
