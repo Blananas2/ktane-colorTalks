@@ -346,7 +346,7 @@ public class standardCrazyTalkScript : MonoBehaviour
     // Twitch Plays Support by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} hover brgybrgy [hovers over the buttons in that order] || !{0} press b [presses the button with that color] || !{0} press tr [presses the button corresponding to that position]";
+    private readonly string TwitchHelpMessage = @"!{0} colorblind/cb [toggles colorblind] || !{0} hover brgybrgy [hovers over the buttons in that order] || !{0} press b [presses the button with that color] || !{0} press tr [presses the button corresponding to that position]";
 #pragma warning restore 414
     private bool TwitchShouldCancelCommand;
     private Coroutine isHovering;
@@ -356,6 +356,18 @@ public class standardCrazyTalkScript : MonoBehaviour
         string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
         yield return null;
+
+        if (new[] { "COLORBLIND", "CB" }.Contains(split[0]))
+        {
+            if (split.Length > 1)
+                yield break;
+
+            CBactive = !CBactive;
+
+            for (int i = 0; i < 4; i++)
+                CBtexts[i].text = CBactive ? "BRGY"[colors[i]].ToString() : string.Empty;
+        }
+
 
         if ("HOVER".ContainsIgnoreCase(split[0]))
         {
