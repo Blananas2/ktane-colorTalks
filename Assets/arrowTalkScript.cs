@@ -238,7 +238,7 @@ public class arrowTalkScript : MonoBehaviour
     // Twitch Plays Support by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} colorblind/cb [toggles colorblind] || !{0} arrow 8 [press that arrow (numbers start from NNE, going clockwise)]";
+    private readonly string TwitchHelpMessage = @"!{0} colorblind/cb [toggles colorblind] || !{0} arrow <#> [presses that arrow (numbers start from NNE, going clockwise)]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)

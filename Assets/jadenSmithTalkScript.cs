@@ -222,7 +222,7 @@ public class jadenSmithTalkScript : MonoBehaviour
     // Twitch Plays by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpCommand = @"!{0} press check/x [presses either the check or the x button]";
+    private readonly string TwitchHelpCommand = @"!{0} press check || !{0} press x [presses the specified button]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)

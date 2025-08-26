@@ -182,7 +182,7 @@ public class boozleTalkScript : MonoBehaviour
     // Twitch Plays Support by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpCommand = @"!{0} submit # to submit when the timer contains that digit";
+    private readonly string TwitchHelpCommand = @"!{0} submit 2 [submits when the timer contains that digit]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)

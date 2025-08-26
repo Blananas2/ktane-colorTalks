@@ -430,7 +430,7 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
     // Twitch Plays Support by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} start [will initialize the module] || !{0} submit 1234 [presses the positions in that order (where 1 is up going clockwise)] In Twitch Plays, the limited time is extended";
+    private readonly string TwitchHelpMessage = @"!{0} start [will initialize the module] || !{0} submit 1234 [presses the positions in that order (starting from the top going clockwise)] In Twitch Plays, the limited time is extended to 30 seconds.";
     private bool TwitchPlaysActive;
 #pragma warning restore 414
 

@@ -193,7 +193,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
     // Twitch Plays by Kilo Bites
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit k submits the letter k";
+    private readonly string TwitchHelpMessage = @"!{0} submit k [submits the specified letter]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
