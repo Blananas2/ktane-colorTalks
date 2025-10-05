@@ -190,108 +190,79 @@ public class crazyTalkWithAKScript : MonoBehaviour
         }
     }
 
-    // Twitch Plays by Kilo Bites
-
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit k [submits the specified letter]";
+    private readonly string TwitchHelpMessage = "!{0} submit k [Submit the specified letter.] | \"submit\" is optional.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        command = command.Trim().ToUpperInvariant();
+        var m = Regex.Match(command, @"^\s*(?:submit\s+)?(?<letter>[A-Z])\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (!m.Success)
+            yield break;
 
-        yield return null;
+        var rgxLetter = m.Groups["letter"].Value[0];
 
-        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        if (!possibleLetters.Contains(rgxLetter))
         {
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror Please specify what letter to submit!";
-                yield break;
-            }
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror Too many parameters inputted. Please try again!";
-            }
-
-            if (split[1].Length > 1)
-                yield break;
-
-            if (!possibleLetters.Contains(split[1]))
-            {
-                yield return string.Format("sendtochaterror {0} is not a valid letter!", split[1]);
-                yield break;
-            }
-
-            var letterToSubmit = possibleLetters.IndexOf(split[1]);
-
-            while (letterToSubmit != selectedLetter)
-            {
-                var distance = (Math.Abs(selectedLetter - letterToSubmit) + 10) % 20 - 10;
-
-                if (selectedLetter > letterToSubmit)
-                    distance *= -1;
-
-                if (distance > 5)
-                {
-                    Arrows[3].OnInteract();
-                    yield return new WaitForSeconds(0.1f);
-                }
-                else if (distance > 0)
-                {
-                    Arrows[2].OnInteract();
-                    yield return new WaitForSeconds(0.1f);
-                }
-                else if (distance < -5)
-                {
-                    Arrows[0].OnInteract();
-                    yield return new WaitForSeconds(0.1f);
-                }
-                else if (distance < 0)
-                {
-                    Arrows[1].OnInteract();
-                    yield return new WaitForSeconds(0.1f);
-                }
-            }
-            Screen.OnInteract();
+            yield return string.Format("sendtochaterror {0} is not a valid letter. Command ignored.", rgxLetter);
+            yield break;
+        }
+        yield return null;
+        var presses = CalculatePressesForTP(selectedLetter, rgxLetter);
+        foreach (var p in presses)
+        {
+            Arrows[p].OnInteract();
             yield return new WaitForSeconds(0.1f);
         }
+        Screen.OnInteract();
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        var targetLetter = possibleLetters.IndexOf(solutionLetter);
-
-        while (targetLetter != selectedLetter)
+        var presses = CalculatePressesForTP(selectedLetter, solutionLetter);
+        foreach (var p in presses)
         {
-            var distance = (Math.Abs(selectedLetter - targetLetter) + 10) % 20 - 10;
+            Arrows[p].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        Screen.OnInteract();
+    }
 
-            if (selectedLetter > targetLetter)
+    private List<int> CalculatePressesForTP(int start, char goal)
+    {
+        var currentLetter = start;
+        var list = new List<int>();
+        var target = possibleLetters.IndexOf(goal);
+        while (target != currentLetter)
+        {
+            var current = currentLetter;
+            var distance = (Math.Abs(current - target) + 10) % 20 - 10;
+            if (current > target)
                 distance *= -1;
 
-            if (distance > 5)
+            if (distance > 4)
             {
-                Arrows[3].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                list.Add(3);
+                currentLetter += 5;
             }
             else if (distance > 0)
             {
-                Arrows[2].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                list.Add(2);
+                currentLetter++;
             }
-            else if (distance < -5)
+            else if (distance < -4)
             {
-                Arrows[0].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                list.Add(0);
+                currentLetter += 15;
             }
             else if (distance < 0)
             {
-                Arrows[1].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                list.Add(1);
+                currentLetter += 19;
             }
+            currentLetter = (currentLetter + 20) % 20;
         }
-
-        Screen.OnInteract();
-        yield return new WaitForSeconds(0.1f);
+        return list;
     }
 }

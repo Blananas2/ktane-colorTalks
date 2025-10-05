@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
+using NUnit.Framework;
 
 public class standardCrazyTalkScript : MonoBehaviour
 {
@@ -182,13 +183,13 @@ public class standardCrazyTalkScript : MonoBehaviour
         Instruction.text = splitIns.PickRandom();
 
         LIVES.SetActive(false);
-        if (CBactive)
-        {
-            for (int t = 0; t < 4; t++)
-            {
-                CBtexts[t].text = "BRGY"[colors[t]].ToString();
-            }
-        }
+        SetColorblindMode(CBactive);
+    }
+
+    void SetColorblindMode(bool mode)
+    {
+        for (int i = 0; i < 4; i++)
+            CBtexts[i].text = mode ? "BRGY"[colors[i]].ToString() : string.Empty;
     }
 
     string wordWrap(string text, int limit)
@@ -331,7 +332,7 @@ public class standardCrazyTalkScript : MonoBehaviour
         int[] answers = { 3, 0, 2, 1, 1, 1, 1, 2, 3, 3, 0, 3, 2, 1, 1, 3, 1, 3, 3, 3, 3, 0, 0, 2, 1, 3, 2, 3, 1 };
         int chosenQuestion = Rnd.Range(0, questions.Length);
         while (correctButton == answers[chosenQuestion]) //this is so it will never show the same question twice in a row
-        { 
+        {
             chosenQuestion = Rnd.Range(0, questions.Length);
         }
         string questionText = questions[chosenQuestion];
@@ -343,143 +344,63 @@ public class standardCrazyTalkScript : MonoBehaviour
         correctButton = answers[chosenQuestion];
     }
 
-    // Twitch Plays Support by Kilo Bites
-
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} colorblind/cb [toggles colorblind] || !{0} hover brgybrgy [hovers over the buttons in that order] || !{0} press b [presses the button with that color] || !{0} press tr [presses the button corresponding to that position]";
+    private readonly string TwitchHelpMessage = "!{0} hover brgybrgy [Hover over the specified buttons.] || !{0} press blue [Press the button with the specified color.] | !{0} colorblind [Toggle colorblind mode.]";
 #pragma warning restore 414
     private bool TwitchShouldCancelCommand;
-    private Coroutine isHovering;
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-        yield return null;
-
-        if (new[] { "COLORBLIND", "CB" }.Contains(split[0]))
+        command = command.Trim().ToLowerInvariant();
+        var m = Regex.Match(command, @"^\s*colou?rblind|cb\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
-            if (split.Length > 1)
-                yield break;
-
+            yield return null;
             CBactive = !CBactive;
-
-            for (int i = 0; i < 4; i++)
-                CBtexts[i].text = CBactive ? "BRGY"[colors[i]].ToString() : string.Empty;
-        }
-
-
-        if ("HOVER".ContainsIgnoreCase(split[0]))
-        {
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror Please specify what colors you want to hover!";
-                yield break;
-            }
-
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror Too many parameters. Please try again!";
-                yield break;
-            }
-
-            if (!split[1].Any("BRGY".Contains))
-            {
-                yield return string.Format("sendtochaterror {0} isn't/aren't valid color(s)!", split[1].Where(x => !"BRGY".Contains(x)).Join(", "));
-                yield break;
-            }
-
-            isHovering = StartCoroutine(Hover(split[1]));
-
-            while (isHovering != null)
-                yield return "trycancel";
-
             yield break;
         }
 
-        if ("PRESS".ContainsIgnoreCase(split[0]))
+        m = Regex.Match(command, @"^\s*(?:hover\s+)(?<colors>[brgy,; ]+)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
-            if (split.Length == 1)
+            var cs = m.Groups["colors"].Value;
+            var list = new List<int>();
+            foreach (var color in cs)
             {
-                yield return "sendtochaterror Press what?";
-                yield break;
-            }
-
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror Too many parameters. Please try again!";
-                yield break;
-            }
-
-            if (split[1].Length > 2)
-            {
-                yield return "sendtochaterror Please specify either a color or a position!";
-                yield break;
-            }
-
-            if (split[1].Length == 1)
-            {
-                if (!"BRGY".Contains(split[1]))
-                {
-                    yield return string.Format("sendtochaterror {0} is not valid!", split[1]);
+                int ix = "brgy,; ".IndexOf(color);
+                if (ix > 3)
+                    continue;
+                if (ix == -1)
                     yield break;
-                }
-
-                var getColorPositions = colors.Select(x => colorNames[x]).ToArray();
-
-                Buttons[Array.IndexOf(getColorPositions, colorNames["BRGY".IndexOf(split[1])])].OnInteract();
-                yield return new WaitForSeconds(0.1f);
-                yield break;
+                list.Add(ix);
             }
 
-            if (split[1].Length == 2)
+            yield return null;
+            foreach (var color in list)
             {
-                var validDirs = new[] { "TL", "TR", "BL", "BR" };
-
-                if (!validDirs.Contains(split[1]))
-                {
-                    yield return string.Format("sendtochaterror {0} is not valid!", split[1]);
-                    yield break;
-                }
-
-                Buttons[Array.IndexOf(validDirs, split[1])].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                yield return "trycancel";
+                int colorIx = Array.IndexOf(colors, color);
+                Buttons[colorIx].OnHighlight();
+                yield return new WaitForSeconds(0.25f);
             }
+            yield break;
+        }
+
+        m = Regex.Match(command, @"^\s*(?:press\s+)(?<input>b|blue|g|green|r|red|y|yellow)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
+        {
+            yield return null;
+            var color = m.Groups["input"].Value[0];
+            int arrIx = "brgy".IndexOf(color);
+            int colorIx = Array.IndexOf(colors, arrIx);
+            Buttons[colorIx].OnInteract();
+            yield break;
         }
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        while (isHovering != null)
-            yield return true;
-
-        if (moduleSolved)
-            yield break;
-
         Buttons[correctButton].OnInteract();
         yield return new WaitForSeconds(0.1f);
     }
-
-
-    IEnumerator Hover(string colorStr)
-    {
-        var colorStrToNames = colorStr.Select(x => colorNames["BRGY".IndexOf(x)]).ToArray();
-
-        var getColorPositions = colors.Select(x => colorNames[x]).ToArray();
-
-        var colorNamesToPositions = colorStrToNames.Select(x => Array.IndexOf(getColorPositions, x)).ToArray();
-
-        foreach (var pos in colorNamesToPositions)
-        {
-            Buttons[pos].OnHighlight();
-            yield return new WaitForSeconds(0.25f);
-
-            if (TwitchShouldCancelCommand)
-                break;
-        }
-
-        isHovering = null;
-    }
-
-
 }
