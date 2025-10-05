@@ -235,57 +235,34 @@ public class arrowTalkScript : MonoBehaviour
         }
     }
 
-    // Twitch Plays Support by Kilo Bites
-
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} colorblind/cb [toggles colorblind] || !{0} arrow <#> [presses that arrow (numbers start from NNE, going clockwise)]";
+    private readonly string TwitchHelpMessage = "!{0} arrow NNE [Press the North-North-East arrow.] | Commands also accept numbers, with 1 starting at NNE, going clockwise. | \"arrow\" is optional. | !{0} colorblind [Toggle colorblind mode.]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-        yield return null;
-
-        if (new[] { "CB", "COLORBLIND" }.Contains(split[0]))
+        command = command.Trim().ToLowerInvariant();
+        var m = Regex.Match(command, @"^\s*(colou?rblind|cb)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
-            if (split.Length > 1)
-                yield break;
-
+            yield return null;
             ToggleCBforTP();
-
             yield break;
         }
 
-        if ("ARROW".ContainsIgnoreCase(split[0]))
+        var validCmds = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "nne", "ene", "ese", "sse", "ssw", "wsw", "wnw", "nnw" };
+        m = Regex.Match(command, @"^\s*(?:(arrow|press|submit)\s+)?(?<arr>(1|2|3|4|5|6|7|8|nne|ene|ese|sse|ssw|wsw|wnw|nnw))\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror What numbered arrow to press?";
+            var inputCmd = m.Groups["arr"].Value;
+            var ix = Array.IndexOf(validCmds, inputCmd) % 8;
+            if (ix == -1)
                 yield break;
-            }
-
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror Too many parameters. Please try again!";
-                yield break;
-            }
-
-            if (split[1].Length > 1)
-            {
-                yield return "sendtochaterror Make sure you're using a single digit and not multiple!";
-                yield break;
-            }
-
-            if (!Enumerable.Range(0, 8).Select(x => x + 1).Contains(int.Parse(split[1])))
-            {
-                yield return string.Format("sendtochaterror {0} is not a valid number. Make sure it's not a letter and that it's in the range of 1-8!", split[1]);
-                yield break;
-            }
-
-            Arrows[int.Parse(split[1]) - 1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
+            yield return null;
+            Arrows[ix].OnInteract();
+            yield break;
         }
+        yield break;
     }
 
     IEnumerator TwitchHandleForcedSolve()

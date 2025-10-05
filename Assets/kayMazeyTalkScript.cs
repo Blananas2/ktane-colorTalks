@@ -218,80 +218,82 @@ public class kayMazeyTalkScript : MonoBehaviour
         return a * (1f - t) + b * t;
     }
 
-    // Twitch Plays Support by Kilo Bites
-
 #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} start [will start the module] || !{0} move urdl [to move in those directions]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-        yield return null;
-
-        if ("START".ContainsIgnoreCase(split[0]))
+        command = command.ToLowerInvariant();
+        var m = Regex.Match(command, @"^\s*start\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
-            if (split.Length > 1)
-                yield break;
-
             if (traversable)
             {
-                yield return "sendtochaterror The module has already started!";
+                yield return "sendtochaterror The module has already started. Command ignored.";
                 yield break;
             }
-
+            yield return null;
             Screen.OnInteract();
-            yield return new WaitForSeconds(0.1f);
             yield break;
         }
 
-        if ("MOVE".ContainsIgnoreCase(split[0]))
+        m = Regex.Match(command, @"^\s*(?:move\s+)(?<dirs>[urdl,; ]+)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (!m.Success)
+            yield break;
+
+        if (!traversable)
         {
-            if (!traversable)
+            yield return "sendtochaterror The module is still in its initial state. Command ignored.";
+            yield break;
+        }
+
+        var input = m.Groups["dirs"].Value;
+        var list = new List<int>();
+        foreach (var inp in input)
+        {
+            int ix = "urdl,; ".IndexOf(inp);
+            if (ix == -1)
+                yield break;
+            if (ix > 3)
+                continue;
+            list.Add(ix);
+        }
+        yield return null;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            Arrows[list[i]].OnInteract();
+            yield return new WaitForSeconds(0.2f);
+            if (invert != tpInvertKnown)
             {
-                yield return "sendtochaterror The module cannot move due to it being in its initial state!";
+                yield return string.Format("sendtochat Module {0} (KayMazey Talk) halted its command because the current display {1} a capital K. The command was halted after {2} movement{3}.",
+                    GetModuleCode(),
+                    invert ? "no longer contains" : "now contains",
+                    i + 1,
+                    i == 0 ? "" : "s");
                 yield break;
             }
-
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror Move where?";
-                yield break;
-            }
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror You inputted too many parameters! Please try again!";
-                yield break;
-            }
-
-            if (!split[1].Any("URDL".Contains))
-            {
-                yield return string.Format("{0} is/are invalid!", split[1].Where(x => !"URDL".Contains(x)).Join(", "));
-                yield break;
-            }
-
-            for (int i = 0; i < split[1].Length; i++)
-            {
-                Arrows["URDL".IndexOf(split[1][i])].OnInteract();
-                yield return new WaitForSeconds(0.1f);
-
-                if (invert && !tpInvertKnown)
-                {
-                    tpInvertKnown = true;
-                    yield return string.Format("sendtochat The current display doesn't contain a capital K. The command was halted after {0} movements.", i + 1);
-                    yield break;
-                }
-                else if (!invert && tpInvertKnown)
-                {
-                    tpInvertKnown = false;
-                    yield return string.Format("sendtochat The current display contains a capital K. The command was halted after {0} movements.", i + 1);
-                    yield break;
-                }
-            }
-
         }
     }
+
+    private string GetModuleCode()
+    {
+        Transform closest = null;
+        float closestDistance = float.MaxValue;
+        foreach (Transform children in transform.parent)
+        {
+            var distance = (transform.position - children.position).magnitude;
+            if (children.gameObject.name == "TwitchModule(Clone)" && (closest == null || distance < closestDistance))
+            {
+                closest = children;
+                closestDistance = distance;
+            }
+        }
+        return closest != null ? closest.Find("MultiDeckerUI").Find("IDText").GetComponent<UnityEngine.UI.Text>().text : null;
+    }
+
+    // Autosolver by Kilo Bites
 
     private struct QueueInfo
     {
@@ -315,7 +317,6 @@ public class kayMazeyTalkScript : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-
         var q = new Queue<QueueInfo>();
         var visited = new Dictionary<int, QueueInfo>();
 
@@ -324,25 +325,21 @@ public class kayMazeyTalkScript : MonoBehaviour
         while (q.Count > 0)
         {
             var qi = q.Dequeue();
-
             if (visited.ContainsKey(qi.CurrentPos))
                 continue;
-
             visited[qi.CurrentPos] = qi;
-
             if (qi.CurrentPos == goalPosition)
                 goto goalfound;
 
             for (int i = 0; i < 4; i++)
             {
                 var p = (int)Math.Pow(2, i);
-
                 if ((mazeDirs[qi.CurrentPos] & p) == p)
                     q.Enqueue(new QueueInfo(qi.CurrentPos + vectors[i], qi.CurrentPos, i));
             }
         }
 
-        throw new InvalidOperationException("The maze is not solvable!");
+        throw new InvalidOperationException(string.Format("KayMazey Talk #{0} is not solvable.", moduleId));
 
     goalfound:
 

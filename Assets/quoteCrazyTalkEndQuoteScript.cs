@@ -427,82 +427,65 @@ public class quoteCrazyTalkEndQuoteScript : MonoBehaviour
         return a * (1f - t) + b * t;
     }
 
-    // Twitch Plays Support by Kilo Bites
-
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} start [will initialize the module] || !{0} submit 1234 [presses the positions in that order (starting from the top going clockwise)] In Twitch Plays, the limited time is extended to 30 seconds.";
+    private readonly string TwitchHelpMessage = @"!{0} start [Start the module.] || !{0} submit urdl [Press the small screens in said direction.] | In Twitch Plays, the limited time is extended to 30 seconds.";
     private bool TwitchPlaysActive;
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-        yield return null;
-
-        if ("START".ContainsIgnoreCase(split[0]))
+        command.Trim();
+        var m = Regex.Match(command, @"^\s*start\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
             if (started)
             {
-                yield return "sendtochaterror The module has already started!";
+                yield return "sendtochaterror The module has already started. Command ignored.";
                 yield break;
             }
-
-            if (split.Length > 1)
-                yield break;
-
+            yield return null;
             MainScreen.OnInteract();
-            yield return new WaitForSeconds(0.1f);
             yield break;
         }
 
-        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        m = Regex.Match(command, @"^\s*(?:(submit|press)\s+)?(?<input>[urdl,; ]+)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (!m.Success)
+            yield break;
+
+        if (!started)
         {
-            if (!started)
-            {
-                yield return "sendtochaterror The module hasn't been started yet!";
-                yield break;
-            }
-
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror Submit what?";
-                yield break;
-            }
-
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror Too many parameters inputted. Please try again!";
-                yield break;
-            }
-
-            if (split[1].Length != 4 || split[1].Distinct().Count() != 4)
-            {
-                yield return "sendtochaterror You must input the exact length of 4 and they must be unique!";
-                yield break;
-            }
-
-            if (split[1].Select(x => int.Parse(x.ToString())).Any(x => x == -1 || !Enumerable.Range(0, 4).Contains(x - 1)))
-            {
-                yield return "sendtochaterror The numbers inputted are either invalid or not within the range of 1-4!";
-                yield break;
-            }
-
-            foreach (var num in split[1].Select(x => int.Parse(x.ToString()) - 1))
-            {
-                SmallScreens[num].OnInteract();
-                yield return new WaitForSeconds(0.1f);
-            }
+            yield return "sendtochaterror The module has not started yet. Command ignored.";
+            yield break;
         }
+
+        var input = m.Groups["input"].Value;
+        var list = new List<int>();
+        foreach (var inp in input)
+        {
+            int ix = "urdl".IndexOf(inp);
+            if (ix > 3)
+                continue;
+            if (ix == -1)
+                yield break;
+            list.Add(ix);
+        }
+
+        yield return null;
+        foreach (var p in list)
+        {
+            SmallScreens[p].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        yield break;
     }
     IEnumerator TwitchHandleForcedSolve()
     {
+        yield return null;
         if (!started)
         {
             MainScreen.OnInteract();
             yield return new WaitForSeconds(0.1f);
         }
-
         for (int i = 0; i < 4; i++)
         {
             SmallScreens[randDigits.Count(x => correctDigits[i] == x) > 1 ? Enumerable.Range(0, 4).Where(x => !pressed[x] && randDigits[x] == correctDigits[i]).PickRandom() : Array.IndexOf(randDigits, correctDigits[i])].OnInteract();

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
+using UnityEngine.Video;
 
 public class jadenSmithTalkScript : MonoBehaviour
 {
@@ -213,70 +214,45 @@ public class jadenSmithTalkScript : MonoBehaviour
         }
         Quote.text = null;
     }
-    
+
     float Lerp(float a, float b, float t)
     { //this assumes t is in the range 0-1
         return a * (1f - t) + b * t;
     }
 
-    // Twitch Plays by Kilo Bites
-
 #pragma warning disable 414
-    private readonly string TwitchHelpCommand = @"!{0} press check || !{0} press x [presses the specified button]";
+    private readonly string TwitchHelpMessage = "!{0} press check [Press the check button.] | !{0} press x [Press the X button.] | \"press\" is optional.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        command = command.Trim().ToLowerInvariant();
+        var m = Regex.Match(command, @"^\s*(?:(press|submit)\s+)?(?<input>[a-z]+)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-        yield return null;
+        if (!m.Success)
+            yield break;
 
-        if ("PRESS".ContainsIgnoreCase(split[0]))
+        var checks = new string[] { "check", "yes", "green", "y", "correct" };
+        var crosses = new string[] { "x", "cross", "no", "n", "red", "wrong" };
+
+        if (checks.Contains(m.Groups["input"].Value))
         {
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror Press what?";
-                yield break;
-            }
-
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror You have inputted too many parameters. Please try again!";
-                yield break;
-            }
-
-            var valids = new[] { "CHECK", "X" };
-
-            if (!valids.Contains(split[1]))
-            {
-                yield return string.Format("{0} is not a valid button!", split[1]);
-                yield break;
-            }
-
-            if ("CHECK".ContainsIgnoreCase(split[1]))
-            {
-                Check.OnInteract();
-                yield return new WaitForSeconds(0.1f);
-            }
-            else
-            {
-                Cross.OnInteract();
-                yield return new WaitForSeconds(0.1f);
-            } 
+            yield return null;
+            Check.OnInteract();
+            yield break;
         }
+        if (crosses.Contains(m.Groups["input"].Value))
+        {
+            yield return null;
+            Cross.OnInteract();
+            yield break;
+        }
+        yield break;
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        if (ans)
-        {
-            Check.OnInteract();
-            yield return new WaitForSeconds(0.1f);
-        }
-        else
-        {
-            Cross.OnInteract();
-            yield return new WaitForSeconds(0.1f);
-        }
+        yield return null;
+        (ans ? Check : Cross).OnInteract();
     }
 }

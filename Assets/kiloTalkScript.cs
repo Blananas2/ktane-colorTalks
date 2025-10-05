@@ -65,7 +65,7 @@ public class kiloTalkScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-    tryAgain:
+        tryAgain:
         ulong number = (ulong)Rnd.Range(1, 10000);
         int fromUnit = Rnd.Range(0, 14);
         int toUnit = Rnd.Range(0, 14);
@@ -150,13 +150,11 @@ public class kiloTalkScript : MonoBehaviour
         if (numberOfDigits == 14) { RightObj.localScale = new Vector3(0f, 0f, 0f); }
         moving = false;
     }
-    
+
     float Lerp(float a, float b, float t)
     { //this assumes t is in the range 0-1
         return a * (1f - t) + b * t;
     }
-
-    // Twitch Plays Support by Kilo Bites
 
 #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} enter 0123456789 [enters the number you want to input from the current index] || !{0} submit [submits the number you have]";
@@ -164,99 +162,72 @@ public class kiloTalkScript : MonoBehaviour
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        command = command.Trim().ToLowerInvariant();
+        var m = Regex.Match(command, @"^\s*(?:submit\s+)(?<nums>(\d+))\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (!m.Success)
+            yield break;
 
-        yield return null;
-
-        if ("ENTER".ContainsIgnoreCase(split[0]))
+        var inputNums = m.Groups["nums"].Value;
+        if (inputNums.Length > 14)
         {
-            if (split.Length == 1)
-            {
-                yield return "sendtochaterror Enter what?";
-                yield break;
-            }
-
-            if (split.Length > 2)
-            {
-                yield return "sendtochaterror Too many parameters. Please try again!";
-                yield break;
-            }
-
-            if (!split[1].Any(char.IsDigit))
-            {
-                yield return string.Format("sendtochaterror {0} is/are invalid!", split[1].Where(x => !char.IsDigit(x)).Join(", "));
-                yield break;
-            }
-
-            if (split[1].Length > 14)
-            {
-                yield return "sendtochaterror You have too many numbers!";
-                yield break;
-            }
-
-            for (int i = 0; i < split[1].Length; i++)
-            {
-                var targetNumber = int.Parse(split[1][i].ToString());
-                var currentNumber = int.Parse(givenString[numberOfDigits].ToString());
-
-                while (currentNumber != targetNumber)
-                {
-                    UpDownArrows[currentNumber < targetNumber ? 0 : 1].OnInteract();
-                    yield return new WaitForSeconds(0.1f);
-                    currentNumber = int.Parse(givenString[numberOfDigits].ToString());
-                }
-
-                if (i != split[1].Length - 1)
-                {
-                    RightArrow.OnInteract();
-                    yield return new WaitWhile(() => moving);
-                }
-            }
-
+            yield return "sendtochaterror Attempting to input too large of a number. Command ignored.";
             yield break;
         }
 
-        if ("SUBMIT".ContainsIgnoreCase(split[0]))
+        yield return null;
+        var presses = CalculatePressesForTP(givenString, inputNums, numberOfDigits);
+        foreach (var p in presses)
         {
-            if (split.Length > 1)
-                yield break;
-
-            Submit.OnInteract();
-            yield return new WaitForSeconds(0.1f);
+            p.OnInteract();
+            if (p == RightArrow)
+                yield return new WaitWhile(() => moving);
+            else
+                yield return new WaitForSeconds(0.1f);
         }
+        Submit.OnInteract();
+        yield break;
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
+        yield return null;
         if (givenString == answerString)
         {
             Submit.OnInteract();
-            yield return new WaitForSeconds(0.1f);
             yield break;
         }
 
-        for (int i = numberOfDigits; i < answerString.Length; i++)
+        var presses = CalculatePressesForTP(givenString, answerString, numberOfDigits);
+        foreach (var p in presses)
         {
-            var targetNumber = int.Parse(answerString[i].ToString());
-            var currentNumber = int.Parse(givenString[i].ToString());
-
-            while (currentNumber != targetNumber)
-            {
-                UpDownArrows[currentNumber < targetNumber ? 0 : 1].OnInteract();
-                yield return new WaitForSeconds(0.1f);
-                currentNumber = int.Parse(givenString[i].ToString());
-            }
-
-            if (i != answerString.Length - 1)
-            {
-                RightArrow.OnInteract();
+            p.OnInteract();
+            if (p == RightArrow)
                 yield return new WaitWhile(() => moving);
-            }
+            else
+                yield return new WaitForSeconds(0.1f);
         }
-
-        yield return null;
-
         Submit.OnInteract();
-        yield return new WaitForSeconds(0.1f);
+        yield break;
+    }
+
+    private List<KMSelectable> CalculatePressesForTP(string start, string goal, int nod)
+    {
+        var list = new List<KMSelectable>();
+        string s = start;
+        for (int i = nod; i < goal.Length; i++)
+        {
+            var current = s[i] - '0';
+            var target = goal[i] - '0';
+            while (current != target)
+            {
+                var distance = ((Math.Abs(current - target) + 5) % 10 - 5) * (current > target ? -1 : 1);
+                list.Add(distance > 0 ? UpDownArrows[0] : UpDownArrows[1]);
+                current = (current + (distance > 0 ? 1 : 9)) % 10;
+            }
+            if (i != goal.Length - 1)
+                list.Add(RightArrow);
+            s += "0";
+        }
+        return list;
     }
 }
