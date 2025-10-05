@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
-using UnityEngine.Video;
 
 public class jadenSmithTalkScript : MonoBehaviour
 {
