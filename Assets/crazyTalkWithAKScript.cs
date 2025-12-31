@@ -38,6 +38,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
     int[][] pairings = { new int[] { 0, 1 }, new int[] { 0, 2 }, new int[] { 0, 3 }, new int[] { 0, 4 }, new int[] { 0, 5 }, new int[] { 0, 6 }, new int[] { 0, 7 }, new int[] { 0, 8 }, new int[] { 1, 2 }, new int[] { 1, 3 }, new int[] { 1, 4 }, new int[] { 1, 5 }, new int[] { 1, 6 }, new int[] { 1, 7 }, new int[] { 1, 8 }, new int[] { 2, 3 }, new int[] { 2, 4 }, new int[] { 2, 5 }, new int[] { 2, 6 }, new int[] { 2, 7 }, new int[] { 2, 8 }, new int[] { 3, 4 }, new int[] { 3, 5 }, new int[] { 3, 6 }, new int[] { 3, 7 }, new int[] { 3, 8 }, new int[] { 4, 5 }, new int[] { 4, 6 }, new int[] { 4, 7 }, new int[] { 4, 8 }, new int[] { 5, 6 }, new int[] { 5, 7 }, new int[] { 5, 8 }, new int[] { 6, 7 }, new int[] { 6, 8 }, new int[] { 7, 8 } };
     char solutionLetter;
     int selectedLetter = 9;
+    string distortedWord;
 
     //Logging
     static int moduleIdCounter = 1;
@@ -100,6 +101,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
                 }
             }
         }
+        distortedWord = table[centerIx];
 
         MeshFilter.mesh = Meshes[chosenPairing];
         // clone the mat
@@ -108,7 +110,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
         Wrapper.transform.localEulerAngles = new Vector3(Rnd.Range(-5500, 5100) * 0.01f, 0f, Rnd.Range(-2700, 4000) * 0.01f);
 
         Debug.LogFormat("<Crazy Talk With A K #{0}> Applied distortion: {1}", moduleId, Wrapper.localRotation);
-        Debug.LogFormat("[Crazy Talk With A K #{0}] Distorted word is {1}.", moduleId, table[centerIx]);
+        Debug.LogFormat("[Crazy Talk With A K #{0}] Distorted word is {1}.", moduleId, distortedWord);
         Debug.LogFormat("[Crazy Talk With A K #{0}] The words corresponding to the raised regions are {1} and {2}.", moduleId, table[Offset(centerIx, pair[0])], table[Offset(centerIx, pair[1])]);
         Debug.LogFormat("[Crazy Talk With A K #{0}] The letter they have in common is {1}.", moduleId, solutionLetter.ToString());
     }
@@ -191,12 +193,19 @@ public class crazyTalkWithAKScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "!{0} submit k [Submit the specified letter.] | \"submit\" is optional.";
+    private readonly string TwitchHelpMessage = "!{0} submit k [Submit the specified letter.] | \"submit\" is optional. | !{0} word [Sends the distorted word to chat.]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.Trim().ToUpperInvariant();
+
+        if (command == "WORD")
+        {
+            yield return string.Format("sendtochat The distorted word is {0}.", distortedWord);
+            yield break;
+        }
+
         var m = Regex.Match(command, @"^\s*(?:submit\s+)?(?<letter>[A-Z])\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         if (!m.Success)
             yield break;
