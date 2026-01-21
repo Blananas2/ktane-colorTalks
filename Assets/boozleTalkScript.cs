@@ -159,21 +159,24 @@ public class boozleTalkScript : MonoBehaviour
         {
             { "Filename", "BoozleTalkSettings.json" },
             { "Name", "BoozleTalk Settings" },
-            { "Listing", new List<Dictionary<string, object>>{
+            { "Listings", new List<Dictionary<string, object>>{
                 new Dictionary<string, object>
                 {
                     { "Key", "SetOne" },
-                    { "Text", "Whether Boozleglyph Set 1 is used." }
+                    { "Text", "Set 1" },
+                    { "Description", "Whether Boozleglyph Set 1 is used." }
                 },
                 new Dictionary<string, object>
                 {
                     { "Key", "SetTwo" },
-                    { "Text", "Whether Boozleglyph Set 2 is used." }
+                    { "Text", "Set 2" },
+                    { "Description", "Whether Boozleglyph Set 2 is used." }
                 },
                 new Dictionary<string, object>
                 {
                     { "Key", "SetThree" },
-                    { "Text", "Whether Boozleglyph Set 3 is used." }
+                    { "Text", "Set 3" },
+                    { "Description", "Whether Boozleglyph Set 3 is used." }
                 },
             } }
         }
