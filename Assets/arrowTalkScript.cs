@@ -207,7 +207,7 @@ public class arrowTalkScript : MonoBehaviour
         else
         {
             Module.HandleStrike();
-            Debug.LogFormat("[Arrow Talk #{0}] Pressed {1} clockwise, incorrect. Strike!", moduleId, correctArrow + 1);
+            Debug.LogFormat("[Arrow Talk #{0}] Pressed {1} clockwise, incorrect. Strike!", moduleId, p + 1);
         }
     }
 
