@@ -14,6 +14,7 @@ public class crazyTalkWithAKScript : MonoBehaviour
     public KMBombModule Module;
 
     public Projector Projector;
+    public GameObject Surface;
     public Transform Wrapper;
     public KMSelectable[] Arrows;
     public KMSelectable Screen;
@@ -40,6 +41,8 @@ public class crazyTalkWithAKScript : MonoBehaviour
     int selectedLetter = 9;
     string distortedWord;
 
+    int targetSurfaceLayer;
+
     //Logging
     static int moduleIdCounter = 1;
     int moduleId;
@@ -56,6 +59,8 @@ public class crazyTalkWithAKScript : MonoBehaviour
         }
 
         Screen.OnInteract += delegate () { ScreenPress(); return false; };
+
+        targetSurfaceLayer = Surface.layer;
     }
 
     private float projectorNearClipPlane;
@@ -68,6 +73,21 @@ public class crazyTalkWithAKScript : MonoBehaviour
         Projector.nearClipPlane = projectorNearClipPlane * scale;
         Projector.farClipPlane = projectorFarClipPlane * scale;
         Projector.orthographicSize = projectorOrthographicSize * scale;
+
+        // fix TP camera stuff
+        if (Surface.layer != targetSurfaceLayer)
+        {
+            Surface.layer = targetSurfaceLayer;
+            var camTf = transform.Find("TwitchPlayModuleCamera");
+            if (camTf)
+            {
+                var cam = camTf.GetComponentInChildren<Camera>();
+                if (cam)
+                {
+                    cam.cullingMask |= 1 << targetSurfaceLayer;
+                }
+            }
+        }
     }
 
     // Use this for initialization
