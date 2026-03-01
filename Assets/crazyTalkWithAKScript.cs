@@ -213,18 +213,12 @@ public class crazyTalkWithAKScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "!{0} submit k [Submit the specified letter.] | \"submit\" is optional. | !{0} word [Sends the distorted word to chat.]";
+    private readonly string TwitchHelpMessage = "!{0} submit k [Submit the specified letter.]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.Trim().ToUpperInvariant();
-
-        if (command == "WORD")
-        {
-            yield return string.Format("sendtochat The distorted word is {0}.", distortedWord);
-            yield break;
-        }
 
         var m = Regex.Match(command, @"^\s*(?:submit\s+)?(?<letter>[A-Z])\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         if (!m.Success)
