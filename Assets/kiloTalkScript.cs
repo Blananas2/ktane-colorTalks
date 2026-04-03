@@ -157,7 +157,7 @@ public class kiloTalkScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} enter 0123456789 [enters the number you want to input from the current index] || !{0} submit [submits the number you have]";
+    private readonly string TwitchHelpMessage = @"!{0} submit 0123456789 [submits the number you want to input from the current index]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
