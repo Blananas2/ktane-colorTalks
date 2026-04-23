@@ -77,7 +77,7 @@ public class arrowTalkScript : MonoBehaviour
             Rnd.Range(0, 2) == 0 ? "Cyan" : "Aqua", //Aqua is from Hue
             "Blue",
             Rnd.Range(0, 2) == 0 ? "Purple" : "Violet", //Hue uses both
-            Rnd.Range(0, 2) == 0 ? "Pink" : "Fuschia", //Hue uses both
+            Rnd.Range(0, 2) == 0 ? "Pink" : "Fuchsia", //Hue uses both
         };
         string hollowArrow = "        ⇨";
 
@@ -159,7 +159,7 @@ public class arrowTalkScript : MonoBehaviour
             "Cyan", "Aqua",
             "Blue",
             "Purple", "Violet",
-            "Pink", "Fuschia"
+            "Pink", "Fuchsia"
         };
 
         if (!colorNames.Contains(Phrase.text) || !CBactive)
