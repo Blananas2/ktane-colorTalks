@@ -40,7 +40,6 @@ public class kayMazeyTalkScript : MonoBehaviour
     };
     bool traversable = false;
     bool invert = false;
-    bool tpInvertKnown = false;
     int currentPosition = -1;
     int goalPosition = -1;
     int[] vectors = { -6, 1, 6, -1 };
@@ -75,7 +74,6 @@ public class kayMazeyTalkScript : MonoBehaviour
         }
 
         invert = Rnd.Range(0, 10) < 4;
-        tpInvertKnown = invert;
 
         Debug.LogFormat("[KayMazey Talk #{0}] Your goal is {1}.", moduleId, mazeWords[goalPosition]);
         Debug.LogFormat("[KayMazey Talk #{0}] You start at {1}.", moduleId, mazeWords[currentPosition]);
@@ -259,6 +257,7 @@ public class kayMazeyTalkScript : MonoBehaviour
                 continue;
             list.Add(ix);
         }
+        bool tpInvertKnown = invert;
         yield return null;
 
         for (int i = 0; i < list.Count; i++)
